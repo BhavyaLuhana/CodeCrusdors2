@@ -2,8 +2,6 @@ import cv2
 import numpy as np
 import tensorflow as tf
 import time
-import sqlite3
-from datetime import datetime
 
 # Load trained model
 model = tf.keras.models.load_model("sign_language_interpreter_model.h5")
@@ -18,9 +16,10 @@ class_labels = [
 
 IMG_SIZE = 64
 CONF_THRESHOLD = 0.6
-SPACE_DELAY = 1.5
-MIN_STABLE_FRAMES = 6
+SPACE_DELAY = 1.5          # seconds of pause → space
+MIN_STABLE_FRAMES = 6      # frames required to accept a letter
 
+# State variables
 current_word = ""
 sentence = ""
 
@@ -31,25 +30,11 @@ accepted_letter = ""
 last_confident_time = time.time()
 space_added = False
 
-def save_sentence_to_db(sentence):
-    conn = sqlite3.connect("sign_language.db")
-    cursor = conn.cursor()
-
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-    cursor.execute(
-        "INSERT INTO conversations (timestamp, sentence) VALUES (?, ?)",
-        (timestamp, sentence)
-    )
-
-    conn.commit()
-    conn.close()
-
 cap = cv2.VideoCapture(0)
 
 print("Webcam started")
-print("Hold sign steady for letter")
-print("Pause hand to insert space")
+print("Hold a sign steady to type a letter")
+print("Pause your hand to insert SPACE")
 print("Press Q to quit\n")
 
 while True:
@@ -57,11 +42,13 @@ while True:
     if not ret:
         break
 
+    # Preprocess frame
     img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     img = cv2.resize(img, (IMG_SIZE, IMG_SIZE))
     img = img / 255.0
     img = np.expand_dims(img, axis=0)
 
+    # Predict
     prediction = model.predict(img, verbose=0)
     confidence = np.max(prediction)
     class_index = np.argmax(prediction)
@@ -72,46 +59,65 @@ while True:
         predicted_letter = class_labels[class_index]
         last_confident_time = current_time
 
+        # Stability check
         if predicted_letter == last_predicted:
             stable_count += 1
         else:
             stable_count = 1
             last_predicted = predicted_letter
 
+        # Accept letter only after stable frames
         if stable_count == MIN_STABLE_FRAMES:
             if predicted_letter != accepted_letter:
                 current_word += predicted_letter
                 accepted_letter = predicted_letter
                 space_added = False
+
                 print("Sentence:", sentence + current_word)
 
     else:
-        if current_word and not space_added and current_time - last_confident_time > SPACE_DELAY:
+        # Pause-based SPACE
+        if (current_word and
+            not space_added and
+            current_time - last_confident_time > SPACE_DELAY):
+
             sentence += current_word + " "
             current_word = ""
             accepted_letter = ""
             last_predicted = ""
             stable_count = 0
             space_added = True
+
             print("Sentence:", sentence)
 
-    cv2.putText(frame, f"Word: {current_word}", (10, 40),
-                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+    # Display info
+    cv2.putText(
+        frame,
+        f"Word: {current_word}",
+        (10, 40),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        1,
+        (0, 255, 0),
+        2
+    )
 
-    cv2.putText(frame, f"Sentence: {sentence}", (10, 80),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 0), 2)
+    cv2.putText(
+        frame,
+        f"Sentence: {sentence}",
+        (10, 80),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.8,
+        (255, 255, 0),
+        2
+    )
 
-    cv2.imshow("Sign Language Recognition", frame)
+    cv2.imshow("Stable Sign Recognition", frame)
 
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    if cv2.waitKey(1) & 0xFF == ord("q"):
         break
 
 cap.release()
 cv2.destroyAllWindows()
 
-final_sentence = sentence + current_word
-print("\nFinal sentence:", final_sentence)
-
-if final_sentence.strip():
-    save_sentence_to_db(final_sentence)
-    print("Sentence saved to database.")
+print("\nFinal sentence:")
+print(sentence + current_word)
