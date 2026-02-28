@@ -26,16 +26,11 @@ function Home() {
         video: true,
       });
 
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-      }
-
+      videoRef.current.srcObject = stream;
       setIsRunning(true);
 
-      // Start prediction loop only after camera works
-      const intervalId = setInterval(async () => {
-        if (!videoRef.current) return;
-
+      // Start ML prediction loop
+      intervalRef.current = setInterval(async () => {
         const image = captureFrame();
 
         try {
@@ -51,8 +46,19 @@ function Home() {
 
     } catch (error) {
       console.error("Camera error:", error);
-      alert("Camera not accessible. Check permissions.");
     }
+  };
+  const stopCamera = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+
+    if (videoRef.current && videoRef.current.srcObject) {
+      const tracks = videoRef.current.srcObject.getTracks();
+      tracks.forEach(track => track.stop());
+    }
+
+    setIsRunning(false);
   };
   return (
     <div className="min-h-screen bg-black text-white">
@@ -77,10 +83,10 @@ function Home() {
 
         {/* Start Button */}
         <button
-          onClick={startCamera}
+          onClick={isRunning ? stopCamera : startCamera}
           className="mt-6 px-6 py-3 bg-blue-600 rounded-xl hover:bg-blue-700 transition"
         >
-          Start
+          {isRunning ? "Stop" : "Start"}
         </button>
       </div>
     </div>
