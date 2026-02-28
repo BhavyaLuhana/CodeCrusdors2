@@ -21,25 +21,38 @@ function Home() {
 
   // Start Camera
   const startCamera = async () => {
-    const stream = await navigator.mediaDevices.getUserMedia({
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
         video: true,
-    });
-    videoRef.current.srcObject = stream;
-    setIsRunning(true);
+      });
 
-    setInterval(async () => {
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+
+      setIsRunning(true);
+
+      // Start prediction loop only after camera works
+      const intervalId = setInterval(async () => {
+        if (!videoRef.current) return;
+
         const image = captureFrame();
 
         try {
-        const res = await axios.post("http://localhost:5000/api/predict", {
+          const res = await axios.post("http://localhost:5000/api/predict", {
             image,
-        });
+          });
 
-        setSubtitle(res.data.text);
+          setSubtitle(res.data.text);
         } catch (err) {
-        console.error(err);
+          console.error("Prediction error:", err);
         }
-    }, 2000); // every 2 seconds
+      }, 2000);
+
+    } catch (error) {
+      console.error("Camera error:", error);
+      alert("Camera not accessible. Check permissions.");
+    }
   };
 
   return (
