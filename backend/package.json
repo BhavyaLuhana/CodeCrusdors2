@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@clerk/clerk-react": "^5.61.3",
+    "lucide-react": "^0.575.0"
+  }
+}
