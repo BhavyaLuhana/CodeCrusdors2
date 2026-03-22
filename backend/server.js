@@ -13,10 +13,10 @@ import { errorHandler, notFound } from "./middlewares/errorMiddleware.js";
 // Route imports
 import authRoutes from "./routes/authRoutes.js";
 import historyRoutes from "./routes/historyRoutes.js";
-// import signRoutes from "./routes/signRoutes.js";
-// import subjectRoutes from "./routes/subjectRoutes.js";
-// import searchRoutes from "./routes/searchRoutes.js";
-// import quizRoutes from "./routes/quizRoutes.js";
+import signRoutes from "./routes/signRoutes.js";
+import subjectRoutes from "./routes/subjectRoutes.js";
+import searchRoutes from "./routes/searchRoutes.js";
+import quizRoutes from "./routes/quizRoutes.js";
 
 // Load environment variables
 dotenv.config();
@@ -93,10 +93,10 @@ const API_PREFIX = "/api/v1";
 
 app.use(`${API_PREFIX}/auth`, authRoutes);
 app.use(`${API_PREFIX}/history`, historyRoutes);
-// app.use(`${API_PREFIX}/signs`, signRoutes);
-// app.use(`${API_PREFIX}/subjects`, subjectRoutes);
-// app.use(`${API_PREFIX}/search`, searchRoutes);
-// app.use(`${API_PREFIX}/quiz`, quizRoutes);
+app.use(`${API_PREFIX}/signs`, signRoutes);
+app.use(`${API_PREFIX}/subjects`, subjectRoutes);
+app.use(`${API_PREFIX}/search`, searchRoutes);
+app.use(`${API_PREFIX}/quiz`, quizRoutes);
 
 // Apply ML-specific rate limiter to predict route
 app.use(`${API_PREFIX}/history/predict`, mlLimiter);
