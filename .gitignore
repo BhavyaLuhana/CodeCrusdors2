@@ -22,3 +22,24 @@ Thumbs.db
 # Build output
 dist/
 build/
+
+
+# ─── Python Virtual Environment ───────────────────────────────────────────────
+venv/
+env/
+.venv/
+venv*/
+ENV/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# ML model files (too large for git)
+*.h5
+*.keras
+*.pt
+*.pkl
+*.onnx
