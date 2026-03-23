@@ -2,6 +2,7 @@
 
 import { useRef, useCallback, useState, useEffect } from "react";
 import Webcam from "react-webcam";
+import { FlipHorizontal, Circle } from "lucide-react";
 
 const videoConstraints = {
   width:      640,

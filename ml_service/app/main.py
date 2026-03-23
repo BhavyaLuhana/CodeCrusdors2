@@ -10,7 +10,7 @@ from app.routers.predict import router
 
 load_dotenv()
 
-# ── Logging ────────────────────────────────────────────────────────────────────
+# Logging
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
@@ -18,7 +18,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-# ── Lifespan ───────────────────────────────────────────────────────────────────
+# Lifespan
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("🚀 Sign Language ML Service starting...")
@@ -26,7 +26,7 @@ async def lifespan(app: FastAPI):
     logger.info("🛑 Sign Language ML Service shutting down...")
 
 
-# ── App ────────────────────────────────────────────────────────────────────────
+# App
 app = FastAPI(
     title="Sign Language ML Service",
     description=(
@@ -40,7 +40,7 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
-# ── CORS ───────────────────────────────────────────────────────────────────────
+# CORS
 allowed_origins = os.getenv(
     "ALLOWED_ORIGINS",
     "http://localhost:5000,http://localhost:5173"
@@ -54,11 +54,11 @@ app.add_middleware(
     allow_headers=["Content-Type", "Authorization"],
 )
 
-# ── Routes ─────────────────────────────────────────────────────────────────────
+# Routes
 app.include_router(router)
 
 
-# ── Root ───────────────────────────────────────────────────────────────────────
+# Root
 @app.get("/", tags=["Root"])
 async def root():
     return {

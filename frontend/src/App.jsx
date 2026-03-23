@@ -9,7 +9,7 @@ import Layout from "./components/layout/Layout";
 import Home     from "./pages/Home";
 import History  from "./pages/History";
 import Library  from "./pages/Library";
-import Search   from "./pages/Search";
+import Search_   from "./pages/Search";
 import Quiz     from "./pages/Quiz";
 import NotFound from "./pages/NotFound";
 
@@ -62,7 +62,7 @@ const App = () => {
               path="search"
               element={
                 <ProtectedRoute>
-                  <Search />
+                  <Search_ />
                 </ProtectedRoute>
               }
             />

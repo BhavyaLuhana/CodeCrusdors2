@@ -1,6 +1,7 @@
 // frontend/src/pages/Library.jsx
 
 import { useState } from "react";
+import { ChevronRight, Search, SlidersHorizontal } from "lucide-react";
 import SignCard from "../components/library/SignCard";
 import Loader from "../components/ui/Loader";
 import ErrorMessage from "../components/ui/ErrorMessage";
@@ -8,16 +9,16 @@ import useApi from "../hooks/useApi";
 import { subjectAPI, signAPI } from "../api/api";
 
 const DIFFICULTY_OPTIONS = [
-  { label: "All Levels",    value: ""             },
-  { label: "Beginner",      value: "beginner"     },
-  { label: "Intermediate",  value: "intermediate" },
-  { label: "Advanced",      value: "advanced"     },
+  { label: "All Levels",   value: ""             },
+  { label: "Beginner",     value: "beginner"     },
+  { label: "Intermediate", value: "intermediate" },
+  { label: "Advanced",     value: "advanced"     },
 ];
 
 const Library = () => {
   const [selectedSubject, setSelectedSubject] = useState(null);
-  const [difficulty, setDifficulty]           = useState("");
-  const [search, setSearch]                   = useState("");
+  const [difficulty,      setDifficulty]      = useState("");
+  const [search,          setSearch]          = useState("");
 
   const {
     data: subjects,
@@ -55,13 +56,14 @@ const Library = () => {
 
   return (
     <div className="space-y-7">
+
       {/* ── Header ── */}
       <div className="animate-fade-up">
         <h1
-          className="text-3xl font-black tracking-tight"
-          style={{ fontFamily: "DM Sans, sans-serif", color: "var(--ink)" }}
+          className="font-display"
+          style={{ color: "var(--ink)", fontSize: "2rem" }}
         >
-          Sign <span className="text-gradient">Library</span>
+          Sign <span style={{ color: "var(--forest)" }}>Library</span>
         </h1>
         <p className="text-sm mt-1" style={{ color: "var(--ink-muted)" }}>
           Browse all signs organized by subject
@@ -75,7 +77,7 @@ const Library = () => {
           <div
             className="rounded-2xl overflow-hidden sticky top-24"
             style={{
-              border: "1.5px solid var(--border)",
+              border:    "1.5px solid var(--border)",
               boxShadow: "var(--shadow-card)",
             }}
           >
@@ -83,7 +85,7 @@ const Library = () => {
             <div
               className="px-4 py-3.5"
               style={{
-                background: "var(--surface-2)",
+                background:   "var(--cream-2)",
                 borderBottom: "1px solid var(--border)",
               }}
             >
@@ -91,12 +93,12 @@ const Library = () => {
             </div>
 
             {subjectsLoading ? (
-              <div className="p-4">
+              <div className="p-3 space-y-2">
                 {[...Array(5)].map((_, i) => (
                   <div
                     key={i}
-                    className="skeleton h-12 rounded-xl mb-2"
-                    style={{ animationDelay: `${i * 100}ms` }}
+                    className="skeleton h-12 rounded-xl"
+                    style={{ animationDelay: `${i * 80}ms` }}
                   />
                 ))}
               </div>
@@ -108,10 +110,7 @@ const Library = () => {
                 />
               </div>
             ) : (
-              <div
-                className="divide-y"
-                style={{ "--tw-divide-color": "var(--border)" }}
-              >
+              <div>
                 {subjects?.map((subject, i) => (
                   <button
                     key={subject._id}
@@ -120,40 +119,57 @@ const Library = () => {
                       setSearch("");
                       setDifficulty("");
                     }}
-                    className="w-full flex items-center gap-3 px-4 py-3.5
-                               text-left transition-all duration-200
-                               hover:bg-surface-2 group"
+                    className="w-full flex items-center gap-3 px-4
+                               py-3.5 text-left transition-all
+                               duration-200 group"
                     style={{
-                      borderBottom: "1px solid var(--border)",
+                      borderBottom:  "1px solid var(--border)",
                       background:
                         selectedSubject?._id === subject._id
-                          ? "var(--brand-light)"
+                          ? "var(--forest-light)"
                           : "transparent",
                       animationDelay: `${i * 50}ms`,
                     }}
+                    onMouseEnter={(e) => {
+                      if (selectedSubject?._id !== subject._id) {
+                        e.currentTarget.style.background =
+                          "var(--cream-2)";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (selectedSubject?._id !== subject._id) {
+                        e.currentTarget.style.background = "transparent";
+                      }
+                    }}
                   >
-                    <span
-                      className="text-xl w-8 h-8 rounded-lg flex
-                                 items-center justify-center shrink-0
+                    {/* Subject icon box */}
+                    <div
+                      className="w-8 h-8 rounded-lg flex items-center
+                                 justify-center text-sm shrink-0
                                  transition-transform duration-200
                                  group-hover:scale-110"
                       style={{
                         background:
                           selectedSubject?._id === subject._id
-                            ? "rgba(108,99,255,0.15)"
-                            : "var(--surface-2)",
+                            ? "var(--forest)"
+                            : "var(--cream-2)",
+                        color:
+                          selectedSubject?._id === subject._id
+                            ? "white"
+                            : "var(--ink-muted)",
+                        border: "1px solid var(--border)",
                       }}
                     >
                       {subject.icon || "📖"}
-                    </span>
-                    <div className="min-w-0">
+                    </div>
+
+                    <div className="min-w-0 flex-1">
                       <p
-                        className="font-semibold text-sm truncate"
+                        className="font-bold text-sm truncate"
                         style={{
-                          fontFamily: "DM Sans, sans-serif",
                           color:
                             selectedSubject?._id === subject._id
-                              ? "var(--brand)"
+                              ? "var(--forest)"
                               : "var(--ink)",
                         }}
                       >
@@ -168,13 +184,14 @@ const Library = () => {
                         </p>
                       )}
                     </div>
+
                     {selectedSubject?._id === subject._id && (
-                      <span
-                        className="ml-auto text-xs font-bold shrink-0"
-                        style={{ color: "var(--brand)" }}
-                      >
-                        →
-                      </span>
+                      <ChevronRight
+                        size={14}
+                        strokeWidth={2.5}
+                        className="ml-auto shrink-0"
+                        style={{ color: "var(--forest)" }}
+                      />
                     )}
                   </button>
                 ))}
@@ -189,18 +206,16 @@ const Library = () => {
             <>
               {/* Toolbar */}
               <div
-                className="flex flex-col sm:flex-row gap-3 sm:items-center
-                           justify-between animate-fade-up"
+                className="flex flex-col sm:flex-row gap-3
+                           sm:items-center justify-between
+                           animate-fade-up"
               >
                 <div>
                   <h2
-                    className="text-xl font-black tracking-tight"
-                    style={{
-                      fontFamily: "DM Sans, sans-serif",
-                      color: "var(--ink)",
-                    }}
+                    className="font-display text-xl font-bold"
+                    style={{ color: "var(--ink)" }}
                   >
-                    {selectedSubject.icon} {selectedSubject.name}
+                    {selectedSubject.name}
                   </h2>
                   {!signsLoading && (
                     <p
@@ -214,28 +229,55 @@ const Library = () => {
                 </div>
 
                 <div className="flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="Search signs..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="input text-sm py-2 w-36"
-                  />
-                  <select
-                    value={difficulty}
-                    onChange={(e) => setDifficulty(e.target.value)}
-                    className="input text-sm py-2 w-36"
-                  >
-                    {DIFFICULTY_OPTIONS.map((o) => (
-                      <option key={o.value} value={o.value}>
-                        {o.label}
-                      </option>
-                    ))}
-                  </select>
+                  {/* Search */}
+                  <div className="relative">
+                    <div
+                      className="absolute inset-y-0 left-3
+                                 flex items-center pointer-events-none"
+                    >
+                      <Search
+                        size={13}
+                        strokeWidth={2.5}
+                        style={{ color: "var(--ink-faint)" }}
+                      />
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="Search..."
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      className="input text-sm py-2 pl-8 w-36"
+                    />
+                  </div>
+
+                  {/* Difficulty */}
+                  <div className="relative">
+                    <div
+                      className="absolute inset-y-0 left-3
+                                 flex items-center pointer-events-none"
+                    >
+                      <SlidersHorizontal
+                        size={13}
+                        strokeWidth={2.5}
+                        style={{ color: "var(--ink-faint)" }}
+                      />
+                    </div>
+                    <select
+                      value={difficulty}
+                      onChange={(e) => setDifficulty(e.target.value)}
+                      className="input text-sm py-2 pl-8 w-40"
+                    >
+                      {DIFFICULTY_OPTIONS.map((o) => (
+                        <option key={o.value} value={o.value}>
+                          {o.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
               </div>
 
-              {/* Grid */}
+              {/* Signs grid */}
               {signsLoading ? (
                 <div className="grid grid-cols-2 sm:grid-cols-3
                                 xl:grid-cols-4 gap-4">
@@ -244,7 +286,7 @@ const Library = () => {
                       key={i}
                       className="skeleton rounded-2xl"
                       style={{
-                        height: "220px",
+                        height:         "220px",
                         animationDelay: `${i * 60}ms`,
                       }}
                     />
@@ -256,17 +298,20 @@ const Library = () => {
                   onRetry={refetchSigns}
                 />
               ) : filteredSigns.length === 0 ? (
-                <div className="text-center py-16 animate-fade-in">
-                  <div
-                    className="w-14 h-14 rounded-2xl flex items-center
-                               justify-center text-2xl mx-auto mb-4"
-                    style={{
-                      background: "var(--surface-2)",
-                      border: "1.5px solid var(--border)",
-                    }}
-                  >
-                    🔍
-                  </div>
+                <div
+                  className="text-center py-16 rounded-2xl
+                             animate-fade-in"
+                  style={{
+                    background: "var(--cream-2)",
+                    border:     "2px dashed var(--border)",
+                  }}
+                >
+                  <Search
+                    size={28}
+                    color="var(--ink-faint)"
+                    strokeWidth={1.5}
+                    className="mx-auto mb-3"
+                  />
                   <p
                     className="font-bold"
                     style={{ color: "var(--ink)" }}
@@ -274,9 +319,12 @@ const Library = () => {
                     No signs match your filters
                   </p>
                   <button
-                    onClick={() => { setSearch(""); setDifficulty(""); }}
-                    className="text-sm mt-2 font-semibold"
-                    style={{ color: "var(--brand)" }}
+                    onClick={() => {
+                      setSearch("");
+                      setDifficulty("");
+                    }}
+                    className="text-sm mt-2 font-bold"
+                    style={{ color: "var(--forest)" }}
                   >
                     Clear filters
                   </button>
@@ -297,22 +345,24 @@ const Library = () => {
               )}
             </>
           ) : (
-            /* Empty state */
             <div
               className="flex flex-col items-center justify-center
-                         h-72 text-center animate-fade-in rounded-2xl"
+                         h-72 text-center rounded-2xl animate-fade-in"
               style={{
-                background: "var(--surface-2)",
-                border: "2px dashed var(--border)",
+                background: "var(--cream-2)",
+                border:     "2px dashed var(--border)",
               }}
             >
-              <span className="text-5xl mb-3 animate-float">👈</span>
+              <ChevronRight
+                size={32}
+                color="var(--ink-faint)"
+                strokeWidth={1.5}
+                className="mb-3 animate-float"
+                style={{ transform: "rotate(180deg)" }}
+              />
               <p
-                className="font-bold"
-                style={{
-                  color: "var(--ink)",
-                  fontFamily: "DM Sans, sans-serif",
-                }}
+                className="font-display font-bold"
+                style={{ color: "var(--ink)" }}
               >
                 Select a subject
               </p>

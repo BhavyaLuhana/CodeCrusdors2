@@ -26,8 +26,6 @@ connectDB();
 
 const app = express();
 
-// Security Middleware
-
 // Set secure HTTP headers
 app.use(helmet());
 
@@ -65,12 +63,10 @@ const mlLimiter = rateLimit({
 });
 
 // Body Parsing
-
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 // Logging
-
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 } else {

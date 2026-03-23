@@ -1,6 +1,9 @@
 // frontend/src/pages/Quiz.jsx
 
 import { useState, useCallback, useRef } from "react";
+import {
+  Brain, Trophy, ChevronRight, X, RotateCcw,
+} from "lucide-react";
 import Flashcard from "../components/quiz/Flashcard";
 import Loader from "../components/ui/Loader";
 import ErrorMessage from "../components/ui/ErrorMessage";
@@ -18,30 +21,33 @@ const StatsPreview = () => {
     <div
       className="rounded-2xl p-5 animate-fade-up delay-300"
       style={{
-        background: "var(--brand-light)",
-        border: "1.5px solid rgba(108,99,255,0.15)",
+        background: "var(--forest-light)",
+        border:     "1.5px solid rgba(74,92,63,0.15)",
       }}
     >
       <p
         className="section-label mb-4"
-        style={{ color: "var(--brand)" }}
+        style={{ color: "var(--forest)" }}
       >
         Your Stats
       </p>
       <div className="grid grid-cols-3 gap-4 text-center mb-4">
         {[
-          { label: "Attempts", value: data.total,           color: "var(--brand)"  },
-          { label: "Correct",  value: data.correct,         color: "#00a88a"       },
-          { label: "Accuracy", value: `${data.accuracyPercent}%`, color: "var(--ink)" },
+          { label: "Attempts", value: data.total,               color: "var(--forest)" },
+          { label: "Correct",  value: data.correct,             color: "#4A5C3F"       },
+          { label: "Accuracy", value: `${data.accuracyPercent}%`, color: "var(--ink)"  },
         ].map(({ label, value, color }) => (
           <div key={label}>
             <p
-              className="text-2xl font-black"
-              style={{ fontFamily: "DM Sans, sans-serif", color }}
+              className="font-display text-2xl font-bold"
+              style={{ color }}
             >
               {value}
             </p>
-            <p className="text-xs mt-0.5" style={{ color: "var(--ink-faint)" }}>
+            <p
+              className="text-xs mt-0.5"
+              style={{ color: "var(--ink-faint)" }}
+            >
               {label}
             </p>
           </div>
@@ -49,13 +55,13 @@ const StatsPreview = () => {
       </div>
       <div
         className="h-2 rounded-full overflow-hidden"
-        style={{ background: "rgba(108,99,255,0.15)" }}
+        style={{ background: "rgba(74,92,63,0.15)" }}
       >
         <div
           className="h-full rounded-full transition-all duration-1000"
           style={{
-            width: `${data.accuracyPercent}%`,
-            background: "linear-gradient(90deg, #6c63ff, #9c4dff)",
+            width:      `${data.accuracyPercent}%`,
+            background: "var(--forest)",
           }}
         />
       </div>
@@ -92,28 +98,33 @@ const QuizSetup = ({ subjects, onStart }) => {
       {/* Hero */}
       <div className="text-center space-y-3 animate-fade-up">
         <div
-          className="w-16 h-16 rounded-2xl flex items-center justify-center
-                     text-3xl mx-auto animate-float"
+          className="w-16 h-16 rounded-2xl flex items-center
+                     justify-center mx-auto animate-float"
           style={{
-            background: "var(--brand-light)",
-            border: "1.5px solid rgba(108,99,255,0.2)",
+            background: "var(--forest-light)",
+            border:     "1.5px solid rgba(74,92,63,0.2)",
           }}
         >
-          🧠
+          <Brain
+            size={28}
+            color="var(--forest)"
+            strokeWidth={1.5}
+          />
         </div>
         <h1
-          className="text-3xl font-black tracking-tight"
-          style={{ fontFamily: "DM Sans, sans-serif", color: "var(--ink)" }}
+          className="font-display"
+          style={{ color: "var(--ink)", fontSize: "2rem" }}
         >
-          Quiz <span className="text-gradient">Mode</span>
+          Quiz <span style={{ color: "var(--forest)" }}>Mode</span>
         </h1>
         <p className="text-sm" style={{ color: "var(--ink-muted)" }}>
           Test your sign language knowledge with flashcards
         </p>
       </div>
 
-      {/* Config card */}
+      {/* Config */}
       <div className="card space-y-6 animate-fade-up delay-75">
+
         {/* Subject */}
         <div>
           <p className="section-label mb-2">Subject</p>
@@ -136,39 +147,32 @@ const QuizSetup = ({ subjects, onStart }) => {
           <p className="section-label mb-3">Difficulty</p>
           <div className="grid grid-cols-4 gap-2">
             {[
-              { label: "All",    value: "",             dot: null      },
-              { label: "Easy",   value: "beginner",     dot: "#00c9a7" },
-              { label: "Medium", value: "intermediate", dot: "#ffb627" },
-              { label: "Hard",   value: "advanced",     dot: "#ff4d6d" },
+              { label: "All",    value: ""             },
+              { label: "Easy",   value: "beginner"     },
+              { label: "Medium", value: "intermediate" },
+              { label: "Hard",   value: "advanced"     },
             ].map((d) => (
               <button
                 key={d.value}
                 onClick={() => setDifficulty(d.value)}
-                className="py-2.5 rounded-xl text-xs font-bold border
-                           transition-all duration-200 hover:-translate-y-0.5
-                           flex items-center justify-center gap-1.5"
+                className="py-2.5 rounded-xl text-xs font-bold
+                           border transition-all duration-200
+                           hover:-translate-y-0.5"
                 style={
                   difficulty === d.value
                     ? {
-                        background:
-                          "linear-gradient(135deg, #6c63ff, #4c3de4)",
-                        color: "white",
-                        border: "1.5px solid transparent",
-                        boxShadow: "0 4px 12px rgba(108,99,255,0.3)",
+                        background: "var(--forest)",
+                        color:      "white",
+                        border:     "2px solid var(--forest)",
+                        boxShadow:  "0 4px 12px rgba(74,92,63,0.25)",
                       }
                     : {
-                        background: "var(--surface-2)",
-                        color: "var(--ink-muted)",
-                        border: "1.5px solid var(--border)",
+                        background: "var(--cream-2)",
+                        color:      "var(--ink-muted)",
+                        border:     "1.5px solid var(--border)",
                       }
                 }
               >
-                {d.dot && (
-                  <span
-                    className="w-2 h-2 rounded-full"
-                    style={{ background: d.dot }}
-                  />
-                )}
                 {d.label}
               </button>
             ))}
@@ -183,24 +187,23 @@ const QuizSetup = ({ subjects, onStart }) => {
               <button
                 key={size}
                 onClick={() => setQuizSize(size)}
-                className="py-2.5 rounded-xl text-sm font-black border
-                           transition-all duration-200 hover:-translate-y-0.5"
-                style={{
-                  fontFamily: "DM Sans, sans-serif",
-                  ...(quizSize === size
+                className="py-2.5 rounded-xl text-sm font-bold
+                           border transition-all duration-200
+                           hover:-translate-y-0.5"
+                style={
+                  quizSize === size
                     ? {
-                        background:
-                          "linear-gradient(135deg, #6c63ff, #4c3de4)",
-                        color: "white",
-                        border: "1.5px solid transparent",
-                        boxShadow: "0 4px 12px rgba(108,99,255,0.3)",
+                        background: "var(--forest)",
+                        color:      "white",
+                        border:     "2px solid var(--forest)",
+                        boxShadow:  "0 4px 12px rgba(74,92,63,0.25)",
                       }
                     : {
-                        background: "var(--surface-2)",
-                        color: "var(--ink-muted)",
-                        border: "1.5px solid var(--border)",
-                      }),
-                }}
+                        background: "var(--cream-2)",
+                        color:      "var(--ink-muted)",
+                        border:     "1.5px solid var(--border)",
+                      }
+                }
               >
                 {size}
               </button>
@@ -212,9 +215,9 @@ const QuizSetup = ({ subjects, onStart }) => {
           <div
             className="rounded-xl p-3 text-sm animate-scale-in"
             style={{
-              background: "rgba(239,68,68,0.06)",
-              border: "1px solid rgba(239,68,68,0.15)",
-              color: "#dc2626",
+              background: "rgba(185,28,28,0.06)",
+              border:     "1px solid rgba(185,28,28,0.15)",
+              color:      "#B91C1C",
             }}
           >
             {error}
@@ -224,18 +227,22 @@ const QuizSetup = ({ subjects, onStart }) => {
         <button
           onClick={handleStart}
           disabled={loading}
-          className="btn-primary w-full py-3.5 text-base"
+          className="btn-primary w-full py-3.5 text-base
+                     flex items-center justify-center gap-2"
         >
           {loading ? (
-            <span className="flex items-center justify-center gap-2">
+            <>
               <span
                 className="w-4 h-4 rounded-full border-2
                            border-white/30 border-t-white animate-spin"
               />
               Loading signs...
-            </span>
+            </>
           ) : (
-            "Start Quiz 🚀"
+            <>
+              <Brain size={16} strokeWidth={2.5} />
+              Start Quiz
+            </>
           )}
         </button>
       </div>
@@ -268,104 +275,104 @@ const QuizResults = ({ results, total, onRestart }) => {
 
   useState(() => { save(); });
 
-  const emoji =
-    accuracy >= 80 ? "🏆"
-    : accuracy >= 60 ? "🎯"
-    : accuracy >= 40 ? "💪"
-    : "📚";
-
-  const accentColor =
-    accuracy >= 80 ? "#00a88a"
-    : accuracy >= 60 ? "#ffb627"
-    : "#dc2626";
+  const trophyColor =
+    accuracy >= 80 ? "var(--forest)"
+    : accuracy >= 60 ? "var(--gold)"
+    : "#B91C1C";
 
   return (
     <div className="max-w-lg mx-auto space-y-5 animate-fade-up">
+
       {/* Score card */}
       <div className="card text-center py-8 space-y-4">
-        <div className="text-6xl animate-bounce-soft">{emoji}</div>
+        <div
+          className="w-16 h-16 rounded-2xl flex items-center
+                     justify-center mx-auto animate-bounce-soft"
+          style={{
+            background: `${trophyColor}15`,
+            border:     `1.5px solid ${trophyColor}30`,
+          }}
+        >
+          <Trophy size={28} color={trophyColor} strokeWidth={1.5} />
+        </div>
+
         <div>
           <p
-            className="text-6xl font-black"
-            style={{
-              fontFamily: "DM Sans, sans-serif",
-              color: accentColor,
-            }}
+            className="font-display font-bold"
+            style={{ fontSize: "4rem", color: trophyColor }}
           >
             {accuracy}%
           </p>
-          <p className="text-sm mt-1" style={{ color: "var(--ink-muted)" }}>
+          <p className="text-sm" style={{ color: "var(--ink-muted)" }}>
             {correct} of {total} correct
           </p>
         </div>
 
-        {/* Progress bar */}
         <div
           className="h-3 rounded-full overflow-hidden mx-4"
-          style={{ background: "var(--surface-2)" }}
+          style={{ background: "var(--cream-2)" }}
         >
           <div
             className="h-full rounded-full transition-all duration-1000"
             style={{
-              width: `${accuracy}%`,
-              background: `linear-gradient(90deg, ${accentColor}, ${accentColor}99)`,
+              width:      `${accuracy}%`,
+              background: trophyColor,
             }}
           />
         </div>
 
         <p className="text-sm" style={{ color: "var(--ink-muted)" }}>
           {accuracy >= 80
-            ? "Excellent! You're mastering sign language! 🌟"
+            ? "Excellent! You are mastering sign language!"
             : accuracy >= 60
             ? "Good job! Keep practicing to improve."
             : accuracy >= 40
-            ? "You're getting there! Review the Library."
+            ? "You are getting there! Review the Library."
             : "Keep going! Check the Library to study signs."}
         </p>
 
-        {/* Save status */}
         <p className="text-xs" style={{ color: "var(--ink-faint)" }}>
           {saving && "Saving results..."}
           {saved && (
-            <span style={{ color: "#00a88a" }}>✅ Results saved</span>
+            <span style={{ color: "var(--forest)" }}>
+              Results saved
+            </span>
           )}
         </p>
       </div>
 
       {/* Breakdown */}
       <div className="card">
-        <p
-          className="section-label mb-4"
-        >
-          Card Breakdown
-        </p>
-        <div
-          className="space-y-2 max-h-56 overflow-y-auto
-                     scrollbar-hide pr-1"
-        >
+        <p className="section-label mb-4">Card Breakdown</p>
+        <div className="space-y-2 max-h-56 overflow-y-auto
+                        scrollbar-hide pr-1">
           {results.map((r, i) => (
             <div
               key={i}
               className="flex items-center justify-between px-3.5
-                         py-2.5 rounded-xl text-sm font-semibold
+                         py-2.5 rounded-xl text-sm font-bold
                          animate-fade-up"
               style={{
                 animationDelay: `${i * 30}ms`,
                 background: r.isCorrect
-                  ? "rgba(0,201,167,0.08)"
-                  : "rgba(239,68,68,0.06)",
-                color: r.isCorrect ? "#00a88a" : "#dc2626",
+                  ? "rgba(74,92,63,0.08)"
+                  : "rgba(185,28,28,0.06)",
+                color: r.isCorrect ? "var(--forest)" : "#B91C1C",
                 border: `1px solid ${
                   r.isCorrect
-                    ? "rgba(0,201,167,0.2)"
-                    : "rgba(239,68,68,0.15)"
+                    ? "rgba(74,92,63,0.2)"
+                    : "rgba(185,28,28,0.15)"
                 }`,
               }}
             >
-              <span style={{ fontFamily: "DM Sans, sans-serif" }}>
+              <span>
                 {i + 1}. {r.signName}
               </span>
-              <span>{r.isCorrect ? "✅" : "❌"}</span>
+              {r.isCorrect ? (
+                <CheckCircle size={16} strokeWidth={2.5} />
+              ) : (
+                <XCircle size={16} strokeWidth={2.5} />
+              )}
             </div>
           ))}
         </div>
@@ -373,11 +380,21 @@ const QuizResults = ({ results, total, onRestart }) => {
 
       {/* Actions */}
       <div className="flex gap-3">
-        <button onClick={onRestart} className="btn-secondary flex-1">
+        <button
+          onClick={onRestart}
+          className="btn-secondary flex-1 flex items-center
+                     justify-center gap-2"
+        >
+          <RotateCcw size={14} strokeWidth={2.5} />
           Change Settings
         </button>
-        <button onClick={onRestart} className="btn-primary flex-1">
-          Quiz Again 🔄
+        <button
+          onClick={onRestart}
+          className="btn-primary flex-1 flex items-center
+                     justify-center gap-2"
+        >
+          <RotateCcw size={14} strokeWidth={2.5} />
+          Quiz Again
         </button>
       </div>
     </div>
@@ -386,18 +403,20 @@ const QuizResults = ({ results, total, onRestart }) => {
 
 // ── Main Quiz Page ─────────────────────────────────────────────────────────────
 const Quiz = () => {
-  const [phase,        setPhase]        = useState("setup");
-  const [signs,        setSigns]        = useState([]);
-  const [sessionId,    setSessionId]    = useState(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [results,      setResults]      = useState([]);
-  const [isAnswered,   setIsAnswered]   = useState(false);
+  const [phase,          setPhase]          = useState("setup");
+  const [signs,          setSigns]          = useState([]);
+  const [sessionId,      setSessionId]      = useState(null);
+  const [currentIndex,   setCurrentIndex]   = useState(0);
+  const [results,        setResults]        = useState([]);
+  const [isAnswered,     setIsAnswered]     = useState(false);
   const [userWasCorrect, setUserWasCorrect] = useState(null);
   const startTimeRef = useRef(null);
 
-  const { data: subjects, loading, error } = useApi(
-    subjectAPI.getAll, null, []
-  );
+  const {
+    data: subjects,
+    loading,
+    error,
+  } = useApi(subjectAPI.getAll, null, []);
 
   const handleStart = ({ signs, sessionId }) => {
     setSigns(signs);
@@ -466,8 +485,8 @@ const Quiz = () => {
   }
 
   const currentSign = signs[currentIndex];
-  const progress    = ((currentIndex + (isAnswered ? 1 : 0)) /
-                        signs.length) * 100;
+  const progress    =
+    ((currentIndex + (isAnswered ? 1 : 0)) / signs.length) * 100;
 
   return (
     <div className="max-w-lg mx-auto space-y-6 animate-fade-up">
@@ -476,7 +495,7 @@ const Quiz = () => {
       <div className="flex items-center justify-between">
         <button
           onClick={handleRestart}
-          className="flex items-center gap-1.5 text-sm font-semibold
+          className="flex items-center gap-1.5 text-sm font-bold
                      transition-colors duration-200"
           style={{ color: "var(--ink-muted)" }}
           onMouseEnter={(e) =>
@@ -486,46 +505,47 @@ const Quiz = () => {
             (e.currentTarget.style.color = "var(--ink-muted)")
           }
         >
-          ← Exit
+          <X size={14} strokeWidth={2.5} />
+          Exit
         </button>
 
         <div
-          className="px-4 py-1.5 rounded-full text-sm font-bold"
+          className="px-4 py-1.5 rounded-lg text-sm font-bold"
           style={{
-            background: "var(--surface-2)",
-            color: "var(--ink-muted)",
-            fontFamily: "DM Sans, sans-serif",
+            background: "var(--cream-2)",
+            color:      "var(--ink-muted)",
+            border:     "1px solid var(--border)",
           }}
         >
           {currentIndex + 1} / {signs.length}
         </div>
 
         <div className="flex items-center gap-2 text-sm font-bold">
-          <span style={{ color: "#00a88a" }}>
-            ✅ {results.filter((r) => r.isCorrect).length}
+          <span style={{ color: "var(--forest)" }}>
+            {results.filter((r) => r.isCorrect).length} correct
           </span>
-          <span style={{ color: "var(--border-2)" }}>/</span>
-          <span style={{ color: "#dc2626" }}>
-            ❌ {results.filter((r) => !r.isCorrect).length}
+          <span style={{ color: "var(--border-2)" }}>·</span>
+          <span style={{ color: "#B91C1C" }}>
+            {results.filter((r) => !r.isCorrect).length} wrong
           </span>
         </div>
       </div>
 
       {/* Progress bar */}
       <div
-        className="h-1.5 rounded-full overflow-hidden"
-        style={{ background: "var(--surface-3)" }}
+        className="h-2 rounded-full overflow-hidden"
+        style={{ background: "var(--cream-2)" }}
       >
         <div
           className="h-full rounded-full transition-all duration-500"
           style={{
-            width: `${progress}%`,
-            background: "linear-gradient(90deg, #6c63ff, #9c4dff)",
+            width:      `${progress}%`,
+            background: "var(--forest)",
           }}
         />
       </div>
 
-      {/* ── Flashcard ── */}
+      {/* Flashcard */}
       <Flashcard
         key={currentSign._id}
         sign={currentSign}
@@ -534,15 +554,25 @@ const Quiz = () => {
         userWasCorrect={userWasCorrect}
       />
 
-      {/* ── Next Button ── */}
+      {/* Next Button */}
       {isAnswered && (
         <button
           onClick={handleNext}
-          className="btn-primary w-full py-3.5 text-base animate-bounce-soft"
+          className="btn-primary w-full py-3.5 text-base
+                     animate-bounce-soft flex items-center
+                     justify-center gap-2"
         >
-          {currentIndex + 1 >= signs.length
-            ? "See Results 🏆"
-            : "Next Card →"}
+          {currentIndex + 1 >= signs.length ? (
+            <>
+              <Trophy size={16} strokeWidth={2} />
+              See Results
+            </>
+          ) : (
+            <>
+              Next Card
+              <ChevronRight size={16} strokeWidth={2.5} />
+            </>
+          )}
         </button>
       )}
     </div>

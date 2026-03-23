@@ -1,15 +1,18 @@
 // frontend/src/pages/Search.jsx
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { Search, SearchX, Sparkles, SlidersHorizontal } from "lucide-react";
 import SignCard from "../components/library/SignCard";
 import Loader from "../components/ui/Loader";
 import { searchAPI } from "../api/api";
 
-const DEBOUNCE_MS   = 350;
-const QUICK_SEARCHES = ["Hello", "Water", "A", "Thank You", "Help",
-                        "Good", "Yes", "No", "Love", "Home"];
+const DEBOUNCE_MS    = 350;
+const QUICK_SEARCHES = [
+  "Hello", "Water", "A", "Thank You",
+  "Help", "Good", "Yes", "No", "Love", "Home",
+];
 
-const Search = () => {
+const Search_ = () => {
   const [query,           setQuery]           = useState("");
   const [results,         setResults]         = useState([]);
   const [suggestions,     setSuggestions]     = useState([]);
@@ -73,10 +76,10 @@ const Search = () => {
       {/* ── Header ── */}
       <div className="animate-fade-up">
         <h1
-          className="text-3xl font-black tracking-tight"
-          style={{ fontFamily: "DM Sans, sans-serif", color: "var(--ink)" }}
+          className="font-display"
+          style={{ color: "var(--ink)", fontSize: "2rem" }}
         >
-          Search <span className="text-gradient">Signs</span>
+          Search <span style={{ color: "var(--forest)" }}>Signs</span>
         </h1>
         <p className="text-sm mt-1" style={{ color: "var(--ink-muted)" }}>
           Search by name, meaning, or keywords
@@ -85,37 +88,33 @@ const Search = () => {
 
       {/* ── Search Box ── */}
       <div
-        className="rounded-2xl p-5 animate-fade-up delay-75"
+        className="rounded-2xl p-5 animate-fade-up delay-75
+                   transition-all duration-300"
         style={{
           background: "var(--surface)",
-          border: `1.5px solid ${focused ? "var(--brand)" : "var(--border)"}`,
+          border:     `1.5px solid ${
+            focused ? "var(--forest)" : "var(--border)"
+          }`,
           boxShadow: focused
-            ? "0 0 0 3px rgba(108,99,255,0.1), var(--shadow-card)"
+            ? "0 0 0 3px rgba(74,92,63,0.1), var(--shadow-card)"
             : "var(--shadow-card)",
-          transition: "all 0.25s ease",
         }}
       >
         <div className="flex gap-3">
-          {/* Search Input */}
+          {/* Input with suggestions */}
           <div className="relative flex-1">
             <div
               className="absolute inset-y-0 left-3.5 flex items-center
                          pointer-events-none"
             >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                style={{ color: focused ? "var(--brand)" : "var(--ink-faint)" }}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2.5}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
+              <Search
+                size={16}
+                strokeWidth={2.5}
+                style={{
+                  color: focused ? "var(--forest)" : "var(--ink-faint)",
+                  transition: "color 0.2s",
+                }}
+              />
             </div>
 
             <input
@@ -137,11 +136,12 @@ const Search = () => {
                 setTimeout(() => setShowSuggestions(false), 150);
               }}
               className="w-full pl-10 pr-4 py-3 rounded-xl text-sm
-                         font-medium outline-none transition-all duration-200"
+                         font-medium outline-none transition-all
+                         duration-200"
               style={{
-                background: "var(--surface-2)",
-                border: "1.5px solid var(--border)",
-                color: "var(--ink)",
+                background: "var(--cream-2)",
+                border:     "1.5px solid var(--border)",
+                color:      "var(--ink)",
               }}
               autoComplete="off"
             />
@@ -150,19 +150,21 @@ const Search = () => {
             {showSuggestions && suggestions.length > 0 && (
               <div
                 className="absolute top-full left-0 right-0 mt-2
-                           rounded-xl overflow-hidden z-20 animate-fade-up"
+                           rounded-xl overflow-hidden z-20
+                           animate-fade-up"
                 style={{
                   background: "var(--surface)",
-                  border: "1.5px solid var(--border)",
-                  boxShadow: "var(--shadow-hover)",
+                  border:     "1.5px solid var(--border)",
+                  boxShadow:  "var(--shadow-hover)",
                 }}
               >
                 {suggestions.map((s, i) => (
                   <button
                     key={s._id}
                     onMouseDown={() => handleSuggestionClick(s)}
-                    className="w-full flex items-center gap-3 px-4 py-3
-                               text-left transition-colors duration-150"
+                    className="w-full flex items-center gap-3 px-4
+                               py-3 text-left transition-colors
+                               duration-150"
                     style={{
                       borderBottom:
                         i < suggestions.length - 1
@@ -170,7 +172,8 @@ const Search = () => {
                           : "none",
                     }}
                     onMouseEnter={(e) =>
-                      (e.currentTarget.style.background = "var(--brand-light)")
+                      (e.currentTarget.style.background =
+                        "var(--forest-light)")
                     }
                     onMouseLeave={(e) =>
                       (e.currentTarget.style.background = "transparent")
@@ -180,17 +183,17 @@ const Search = () => {
                       <img
                         src={s.imageUrl}
                         alt={s.name}
-                        className="w-9 h-9 object-cover rounded-lg shrink-0"
-                        onError={(e) => (e.target.style.display = "none")}
+                        className="w-9 h-9 object-cover rounded-lg
+                                   shrink-0"
+                        onError={(e) =>
+                          (e.target.style.display = "none")
+                        }
                       />
                     )}
                     <div className="min-w-0">
                       <p
                         className="text-sm font-bold truncate"
-                        style={{
-                          fontFamily: "DM Sans, sans-serif",
-                          color: "var(--ink)",
-                        }}
+                        style={{ color: "var(--ink)" }}
                       >
                         {s.name}
                       </p>
@@ -201,30 +204,41 @@ const Search = () => {
                         {s.meaning}
                       </p>
                     </div>
-                    <span
-                      className="ml-auto text-xs font-semibold shrink-0"
-                      style={{ color: "var(--brand)" }}
-                    >
-                      →
-                    </span>
+                    <ChevronRight
+                      size={14}
+                      strokeWidth={2.5}
+                      className="ml-auto shrink-0"
+                      style={{ color: "var(--forest)" }}
+                    />
                   </button>
                 ))}
               </div>
             )}
           </div>
 
-          {/* Difficulty */}
-          <select
-            value={difficulty}
-            onChange={(e) => setDifficulty(e.target.value)}
-            className="input text-sm py-3 w-36 shrink-0"
-            style={{ borderRadius: "0.75rem" }}
-          >
-            <option value="">All levels</option>
-            <option value="beginner">🟢 Beginner</option>
-            <option value="intermediate">🟡 Intermediate</option>
-            <option value="advanced">🔴 Advanced</option>
-          </select>
+          {/* Difficulty filter */}
+          <div className="relative">
+            <div
+              className="absolute inset-y-0 left-3 flex items-center
+                         pointer-events-none"
+            >
+              <SlidersHorizontal
+                size={13}
+                strokeWidth={2.5}
+                style={{ color: "var(--ink-faint)" }}
+              />
+            </div>
+            <select
+              value={difficulty}
+              onChange={(e) => setDifficulty(e.target.value)}
+              className="input text-sm py-3 pl-8 w-36"
+            >
+              <option value="">All levels</option>
+              <option value="beginner">Beginner</option>
+              <option value="intermediate">Intermediate</option>
+              <option value="advanced">Advanced</option>
+            </select>
+          </div>
 
           {/* Search button */}
           <button
@@ -235,13 +249,17 @@ const Search = () => {
             {loading ? (
               <span className="flex items-center gap-2">
                 <span
-                  className="w-4 h-4 rounded-full border-2 border-white/30
-                             border-t-white animate-spin"
+                  className="w-4 h-4 rounded-full border-2
+                             border-white/30 border-t-white
+                             animate-spin"
                 />
                 Searching
               </span>
             ) : (
-              "Search"
+              <>
+                <Search size={14} strokeWidth={2.5} />
+                Search
+              </>
             )}
           </button>
         </div>
@@ -254,22 +272,22 @@ const Search = () => {
         <div
           className="rounded-2xl p-4 text-sm animate-scale-in"
           style={{
-            background: "rgba(239,68,68,0.06)",
-            border: "1px solid rgba(239,68,68,0.15)",
-            color: "#dc2626",
+            background: "rgba(185,28,28,0.06)",
+            border:     "1px solid rgba(185,28,28,0.15)",
+            color:      "#B91C1C",
           }}
         >
           {error}
         </div>
       ) : hasSearched ? (
         <div className="space-y-5 animate-fade-up">
-          {/* Result count bar */}
+          {/* Result count */}
           <div
             className="flex items-center justify-between px-4 py-3
                        rounded-xl"
             style={{
-              background: "var(--surface-2)",
-              border: "1px solid var(--border)",
+              background: "var(--cream-2)",
+              border:     "1px solid var(--border)",
             }}
           >
             <p className="text-sm" style={{ color: "var(--ink-muted)" }}>
@@ -284,7 +302,7 @@ const Search = () => {
                   result{results.length !== 1 ? "s" : ""} for{" "}
                   <span
                     className="font-bold"
-                    style={{ color: "var(--brand)" }}
+                    style={{ color: "var(--forest)" }}
                   >
                     "{query}"
                   </span>
@@ -307,8 +325,8 @@ const Search = () => {
           </div>
 
           {results.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4
-                            xl:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3
+                            lg:grid-cols-4 xl:grid-cols-5 gap-4">
               {results.map((sign, i) => (
                 <div
                   key={sign._id}
@@ -323,15 +341,19 @@ const Search = () => {
             <div
               className="text-center py-16 rounded-2xl animate-fade-in"
               style={{
-                background: "var(--surface-2)",
-                border: "2px dashed var(--border)",
+                background: "var(--cream-2)",
+                border:     "2px dashed var(--border)",
               }}
             >
-              <span className="text-5xl block mb-3">🤷</span>
+              <SearchX
+                size={32}
+                color="var(--ink-faint)"
+                strokeWidth={1.5}
+                className="mx-auto mb-3"
+              />
               <p
-                className="font-bold"
-                style={{ color: "var(--ink)",
-                         fontFamily: "DM Sans, sans-serif" }}
+                className="font-display font-bold"
+                style={{ color: "var(--ink)" }}
               >
                 No signs found for "{query}"
               </p>
@@ -350,21 +372,21 @@ const Search = () => {
           <div>
             <div
               className="w-16 h-16 rounded-2xl flex items-center
-                         justify-center text-3xl mx-auto mb-4
-                         animate-float"
+                         justify-center mx-auto mb-4 animate-float"
               style={{
-                background: "var(--brand-light)",
-                border: "1.5px solid rgba(108,99,255,0.2)",
+                background: "var(--forest-light)",
+                border:     "1.5px solid rgba(74,92,63,0.2)",
               }}
             >
-              🔍
+              <Search
+                size={28}
+                color="var(--forest)"
+                strokeWidth={1.5}
+              />
             </div>
             <p
-              className="text-xl font-black tracking-tight"
-              style={{
-                fontFamily: "DM Sans, sans-serif",
-                color: "var(--ink)",
-              }}
+              className="font-display text-xl font-bold"
+              style={{ color: "var(--ink)" }}
             >
               Search the sign library
             </p>
@@ -372,14 +394,21 @@ const Search = () => {
               className="text-sm mt-1 max-w-sm mx-auto"
               style={{ color: "var(--ink-muted)" }}
             >
-              Try a letter like "A", a word like "Hello", or a
-              concept like "greeting".
+              Try a letter like "A", a word like "Hello",
+              or a concept like "greeting".
             </p>
           </div>
 
-          {/* Quick search pills */}
+          {/* Quick searches */}
           <div>
-            <p className="section-label mb-3">Quick searches</p>
+            <div className="flex items-center justify-center gap-2 mb-3">
+              <Sparkles
+                size={12}
+                strokeWidth={2.5}
+                style={{ color: "var(--ink-faint)" }}
+              />
+              <p className="section-label">Quick searches</p>
+            </div>
             <div className="flex flex-wrap gap-2 justify-center">
               {QUICK_SEARCHES.map((term, i) => (
                 <button
@@ -388,25 +417,25 @@ const Search = () => {
                     setQuery(term);
                     performSearch(term);
                   }}
-                  className="px-4 py-2 rounded-full text-sm font-semibold
+                  className="px-4 py-2 rounded-lg text-sm font-bold
                              transition-all duration-200 animate-fade-up
                              hover:-translate-y-1"
                   style={{
-                    background: "var(--surface)",
-                    border: "1.5px solid var(--border)",
-                    color: "var(--ink-muted)",
-                    boxShadow: "var(--shadow-card)",
+                    background:     "var(--surface)",
+                    border:         "1.5px solid var(--border)",
+                    color:          "var(--ink-muted)",
+                    boxShadow:      "var(--shadow-card)",
                     animationDelay: `${i * 40}ms`,
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = "var(--brand)";
-                    e.currentTarget.style.color = "var(--brand)";
-                    e.currentTarget.style.background = "var(--brand-light)";
+                    e.currentTarget.style.borderColor = "var(--forest)";
+                    e.currentTarget.style.color       = "var(--forest)";
+                    e.currentTarget.style.background  = "var(--forest-light)";
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.borderColor = "var(--border)";
-                    e.currentTarget.style.color = "var(--ink-muted)";
-                    e.currentTarget.style.background = "var(--surface)";
+                    e.currentTarget.style.color       = "var(--ink-muted)";
+                    e.currentTarget.style.background  = "var(--surface)";
                   }}
                 >
                   {term}
@@ -420,4 +449,5 @@ const Search = () => {
   );
 };
 
-export default Search;
+// Fix: Search is also a lucide import name so we export with alias
+export default Search_;

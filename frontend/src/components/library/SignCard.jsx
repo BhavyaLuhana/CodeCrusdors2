@@ -1,32 +1,38 @@
 // frontend/src/components/library/SignCard.jsx
 
 import { useState } from "react";
-import { getDifficultyColor } from "../../utils/helpers";
+import { X, Tag } from "lucide-react";
 
 const difficultyConfig = {
-  beginner:     { label: "Beginner",     dot: "#00c9a7" },
-  intermediate: { label: "Intermediate", dot: "#ffb627" },
-  advanced:     { label: "Advanced",     dot: "#ff4d6d" },
+  beginner:     { label: "Beginner",     color: "#4A5C3F", bg: "rgba(74,92,63,0.08)"   },
+  intermediate: { label: "Intermediate", color: "#A67E1A", bg: "rgba(196,154,42,0.1)"  },
+  advanced:     { label: "Advanced",     color: "#B91C1C", bg: "rgba(185,28,28,0.08)"  },
 };
 
-// ── Sign Detail Modal ──────────────────────────────────────────────────────────
+// ── Sign Modal ─────────────────────────────────────────────────────────────────
 const SignModal = ({ sign, imgError, onClose }) => (
   <div
     className="fixed inset-0 z-50 flex items-center justify-center px-4"
-    style={{ background: "rgba(15,15,26,0.45)", backdropFilter: "blur(6px)" }}
+    style={{
+      background:     "rgba(26,26,26,0.45)",
+      backdropFilter: "blur(6px)",
+    }}
     onClick={onClose}
   >
     <div
-      className="bg-white rounded-3xl shadow-2xl max-w-sm w-full
+      className="rounded-3xl shadow-2xl max-w-sm w-full
                  overflow-hidden animate-scale-in"
-      style={{ border: "1.5px solid var(--border)" }}
+      style={{
+        background: "var(--surface)",
+        border:     "1.5px solid var(--border)",
+      }}
       onClick={(e) => e.stopPropagation()}
     >
       {/* Image */}
       <div
-        className="relative aspect-square flex items-center justify-center
-                   overflow-hidden"
-        style={{ background: "var(--brand-light)" }}
+        className="relative aspect-square flex items-center
+                   justify-center overflow-hidden"
+        style={{ background: "var(--forest-light)" }}
       >
         {!imgError ? (
           <img
@@ -36,48 +42,59 @@ const SignModal = ({ sign, imgError, onClose }) => (
                        transition-transform duration-500 hover:scale-105"
           />
         ) : (
-          <span className="text-8xl animate-float">🤟</span>
+          <div
+            className="w-24 h-24 rounded-2xl flex items-center
+                       justify-center animate-float"
+            style={{ background: "var(--forest)",
+                     opacity: 0.3 }}
+          />
         )}
 
-        {/* Difficulty pill */}
+        {/* Difficulty badge */}
         <div className="absolute top-3 right-3">
           <span
             className="badge"
             style={{
-              background: "white",
-              color: "var(--ink-muted)",
-              border: "1.5px solid var(--border)",
-              boxShadow: "var(--shadow-card)",
+              background: difficultyConfig[sign.difficultyLevel]?.bg
+                || "rgba(26,26,26,0.06)",
+              color: difficultyConfig[sign.difficultyLevel]?.color
+                || "var(--ink-muted)",
+              border: "1px solid rgba(0,0,0,0.06)",
             }}
           >
-            <span
-              className="w-1.5 h-1.5 rounded-full mr-1.5"
-              style={{
-                background:
-                  difficultyConfig[sign.difficultyLevel]?.dot || "#6b6b8a",
-                display: "inline-block",
-              }}
-            />
-            {difficultyConfig[sign.difficultyLevel]?.label ||
-              sign.difficultyLevel}
+            {difficultyConfig[sign.difficultyLevel]?.label
+              || sign.difficultyLevel}
           </span>
         </div>
+
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-3 left-3 w-8 h-8 rounded-full
+                     flex items-center justify-center
+                     transition-colors duration-200"
+          style={{
+            background:     "rgba(253,250,244,0.9)",
+            backdropFilter: "blur(4px)",
+            border:         "1px solid var(--border)",
+            color:          "var(--ink-muted)",
+          }}
+        >
+          <X size={14} strokeWidth={2.5} />
+        </button>
       </div>
 
       {/* Info */}
       <div className="p-6 space-y-4">
         <div>
           <h2
-            className="text-3xl font-black tracking-tight"
-            style={{
-              fontFamily: "DM Sans, sans-serif",
-              color: "var(--ink)",
-            }}
+            className="font-display text-3xl font-bold tracking-tight"
+            style={{ color: "var(--ink)" }}
           >
             {sign.name}
           </h2>
           <p
-            className="text-sm mt-1 leading-relaxed"
+            className="text-sm mt-1.5 leading-relaxed"
             style={{ color: "var(--ink-muted)" }}
           >
             {sign.meaning}
@@ -86,16 +103,23 @@ const SignModal = ({ sign, imgError, onClose }) => (
 
         {sign.keywords?.length > 0 && (
           <div>
-            <p className="section-label mb-2">Keywords</p>
+            <div className="flex items-center gap-1.5 mb-2">
+              <Tag
+                size={11}
+                strokeWidth={2.5}
+                style={{ color: "var(--ink-faint)" }}
+              />
+              <p className="section-label">Keywords</p>
+            </div>
             <div className="flex flex-wrap gap-1.5">
               {sign.keywords.map((kw) => (
                 <span
                   key={kw}
-                  className="px-3 py-1 rounded-full text-xs font-semibold"
+                  className="px-3 py-1 rounded-full text-xs font-bold"
                   style={{
-                    background: "var(--brand-light)",
-                    color: "var(--brand)",
-                    border: "1px solid rgba(108,99,255,0.15)",
+                    background: "var(--forest-light)",
+                    color:      "var(--forest)",
+                    border:     "1px solid rgba(74,92,63,0.15)",
                   }}
                 >
                   {kw}
@@ -115,9 +139,11 @@ const SignModal = ({ sign, imgError, onClose }) => (
 
 // ── Sign Card ──────────────────────────────────────────────────────────────────
 const SignCard = ({ sign }) => {
-  const [imgError,    setImgError]    = useState(false);
-  const [showDetail,  setShowDetail]  = useState(false);
-  const [isHovered,   setIsHovered]   = useState(false);
+  const [imgError,   setImgError]   = useState(false);
+  const [showDetail, setShowDetail] = useState(false);
+  const [isHovered,  setIsHovered]  = useState(false);
+
+  const diff = difficultyConfig[sign.difficultyLevel];
 
   return (
     <>
@@ -129,8 +155,8 @@ const SignCard = ({ sign }) => {
                    transition-all duration-300 animate-fade-up"
         style={{
           background: "var(--surface)",
-          border: "1.5px solid var(--border)",
-          boxShadow: isHovered
+          border:     "1.5px solid var(--border)",
+          boxShadow:  isHovered
             ? "var(--shadow-hover)"
             : "var(--shadow-card)",
           transform: isHovered
@@ -138,10 +164,10 @@ const SignCard = ({ sign }) => {
             : "translateY(0) scale(1)",
         }}
       >
-        {/* Image area */}
+        {/* Image */}
         <div
           className="relative aspect-square overflow-hidden"
-          style={{ background: "var(--brand-light)" }}
+          style={{ background: "var(--forest-light)" }}
         >
           {!imgError ? (
             <img
@@ -149,43 +175,50 @@ const SignCard = ({ sign }) => {
               alt={`Sign: ${sign.name}`}
               className="w-full h-full object-cover transition-transform
                          duration-500"
-              style={{ transform: isHovered ? "scale(1.08)" : "scale(1)" }}
+              style={{
+                transform: isHovered ? "scale(1.08)" : "scale(1)",
+              }}
               onError={() => setImgError(true)}
             />
           ) : (
-            <div
-              className="w-full h-full flex items-center justify-center
-                         text-5xl"
+            <div className="w-full h-full flex items-center
+                            justify-center"
             >
-              🤟
+              <div
+                className="w-16 h-16 rounded-2xl"
+                style={{
+                  background: "var(--forest)",
+                  opacity:    0.2,
+                }}
+              />
             </div>
           )}
 
           {/* Difficulty dot */}
           <div className="absolute top-2.5 right-2.5">
             <span
-              className="w-2.5 h-2.5 rounded-full block shadow-sm"
+              className="w-2.5 h-2.5 rounded-full block"
               style={{
-                background:
-                  difficultyConfig[sign.difficultyLevel]?.dot || "#6b6b8a",
-                boxShadow: `0 0 6px ${
-                  difficultyConfig[sign.difficultyLevel]?.dot || "#6b6b8a"
-                }88`,
+                background: diff?.color || "var(--ink-faint)",
+                boxShadow:  `0 0 6px ${diff?.color || "var(--ink-faint)"}88`,
               }}
             />
           </div>
 
           {/* Hover overlay */}
           <div
-            className="absolute inset-0 flex items-center justify-center
-                       transition-opacity duration-300"
+            className="absolute inset-0 flex items-center
+                       justify-center transition-opacity duration-300"
             style={{
-              background: "rgba(108,99,255,0.85)",
-              opacity: isHovered ? 1 : 0,
+              background: "rgba(74,92,63,0.85)",
+              opacity:    isHovered ? 1 : 0,
             }}
           >
-            <span className="text-white text-sm font-bold tracking-wide">
-              View Details →
+            <span
+              className="text-white text-xs font-bold tracking-widest
+                         uppercase"
+            >
+              View Details
             </span>
           </div>
         </div>
@@ -193,11 +226,8 @@ const SignCard = ({ sign }) => {
         {/* Info */}
         <div className="p-3.5">
           <p
-            className="font-black text-base tracking-tight"
-            style={{
-              fontFamily: "DM Sans, sans-serif",
-              color: "var(--ink)",
-            }}
+            className="font-display font-bold text-base tracking-tight"
+            style={{ color: "var(--ink)" }}
           >
             {sign.name}
           </p>
@@ -213,10 +243,11 @@ const SignCard = ({ sign }) => {
               {sign.keywords.slice(0, 2).map((kw) => (
                 <span
                   key={kw}
-                  className="text-[10px] px-2 py-0.5 rounded-full font-medium"
+                  className="text-[10px] px-2 py-0.5 rounded-full
+                             font-bold"
                   style={{
-                    background: "var(--surface-2)",
-                    color: "var(--ink-faint)",
+                    background: "var(--cream-2)",
+                    color:      "var(--ink-faint)",
                   }}
                 >
                   {kw}

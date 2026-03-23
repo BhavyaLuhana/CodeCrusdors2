@@ -1,6 +1,7 @@
 // frontend/src/pages/History.jsx
 
 import { useState, useCallback } from "react";
+import { Trash2 } from "lucide-react";
 import HistoryTable from "../components/history/HistoryTable";
 import Loader from "../components/ui/Loader";
 import ErrorMessage from "../components/ui/ErrorMessage";
@@ -10,46 +11,32 @@ import { historyAPI } from "../api/api";
 const ITEMS_PER_PAGE = 10;
 
 const FILTERS = [
-  { label: "All",     value: "",       icon: "🗂" },
-  { label: "Image",   value: "image",  icon: "📷" },
-  { label: "Text",    value: "text",   icon: "✏️" },
-  { label: "Speech",  value: "speech", icon: "🎤" },
+  { label: "All",    value: ""       },
+  { label: "Image",  value: "image"  },
+  { label: "Text",   value: "text"   },
+  { label: "Speech", value: "speech" },
 ];
 
-// ── Stat card ──────────────────────────────────────────────────────────────────
-const StatCard = ({ icon, label, value, delay, color }) => (
+// ── Stat Card ──────────────────────────────────────────────────────────────────
+const StatCard = ({ label, value, delay }) => (
   <div
     className="card animate-fade-up"
     style={{ animationDelay: delay }}
   >
-    <div className="flex items-center gap-3">
-      <div
-        className="w-10 h-10 rounded-xl flex items-center
-                   justify-center text-xl shrink-0"
-        style={{ background: color + "15", border: `1px solid ${color}25` }}
-      >
-        {icon}
-      </div>
-      <div>
-        <p className="section-label">{label}</p>
-        <p
-          className="text-2xl font-black mt-0.5"
-          style={{
-            fontFamily: "DM Sans, sans-serif",
-            color: "var(--ink)",
-          }}
-        >
-          {value}
-        </p>
-      </div>
-    </div>
+    <p className="section-label mb-1">{label}</p>
+    <p
+      className="font-display text-3xl font-bold"
+      style={{ color: "var(--forest)" }}
+    >
+      {value}
+    </p>
   </div>
 );
 
 const History = () => {
-  const [page, setPage]           = useState(1);
+  const [page,      setPage]      = useState(1);
   const [inputType, setInputType] = useState("");
-  const [clearing, setClearing]   = useState(false);
+  const [clearing,  setClearing]  = useState(false);
 
   const fetchHistory = useCallback(
     () =>
@@ -100,14 +87,11 @@ const History = () => {
       >
         <div>
           <h1
-            className="text-3xl font-black tracking-tight"
-            style={{
-              fontFamily: "DM Sans, sans-serif",
-              color: "var(--ink)",
-            }}
+            className="font-display"
+            style={{ color: "var(--ink)", fontSize: "2rem" }}
           >
             Prediction{" "}
-            <span className="text-gradient">History</span>
+            <span style={{ color: "var(--forest)" }}>History</span>
           </h1>
           <p className="text-sm mt-1" style={{ color: "var(--ink-muted)" }}>
             All your sign language predictions in one place
@@ -118,84 +102,86 @@ const History = () => {
           <button
             onClick={handleClearAll}
             disabled={clearing}
-            className="btn-danger text-sm shrink-0"
+            className="btn-danger text-sm shrink-0
+                       flex items-center gap-2"
           >
-            {clearing ? "Clearing..." : "🗑 Clear All"}
+            <Trash2 size={14} strokeWidth={2.5} />
+            {clearing ? "Clearing..." : "Clear All"}
           </button>
         )}
       </div>
 
-      {/* ── Stats Row ── */}
+      {/* ── Stats ── */}
       {pagination.total > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <StatCard
-            icon="🔢"
             label="Total Predictions"
             value={pagination.total}
             delay="0ms"
-            color="#6c63ff"
           />
           <StatCard
-            icon="📷"
             label="This Page"
             value={history.length}
             delay="75ms"
-            color="#00c9a7"
           />
           <StatCard
-            icon="📄"
             label="Current Page"
             value={`${page} / ${pagination.totalPages || 1}`}
             delay="150ms"
-            color="#ffb627"
           />
           <StatCard
-            icon="⭐"
             label="Favorited"
             value={history.filter((h) => h.isFavorited).length}
             delay="225ms"
-            color="#ff4d6d"
           />
         </div>
       )}
 
       {/* ── Filters ── */}
-      <div className="flex items-center gap-2 flex-wrap animate-fade-up
-                      delay-150">
+      <div
+        className="flex items-center gap-2 flex-wrap
+                   animate-fade-up delay-150"
+      >
         <span
-          className="text-xs font-bold mr-1"
-          style={{ color: "var(--ink-faint)",
-                   fontFamily: "DM Sans, sans-serif" }}
+          className="section-label mr-1"
+          style={{ color: "var(--ink-faint)" }}
         >
-          FILTER
+          Filter
         </span>
         {FILTERS.map((f) => (
           <button
             key={f.value}
             onClick={() => handleFilterChange(f.value)}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full
-                       text-sm font-semibold border transition-all
-                       duration-200 hover:-translate-y-0.5"
+            className="px-4 py-1.5 rounded-lg text-sm font-bold
+                       border transition-all duration-200
+                       hover:-translate-y-0.5"
             style={
               inputType === f.value
                 ? {
-                    background:
-                      "linear-gradient(135deg, #6c63ff, #4c3de4)",
-                    color: "white",
-                    border: "1.5px solid transparent",
-                    boxShadow: "0 4px 12px rgba(108,99,255,0.3)",
+                    background:  "var(--forest)",
+                    color:       "white",
+                    border:      "2px solid var(--forest)",
+                    boxShadow:   "0 4px 12px rgba(74,92,63,0.25)",
                   }
                 : {
-                    background: "var(--surface)",
-                    color: "var(--ink-muted)",
-                    border: "1.5px solid var(--border)",
+                    background:  "var(--surface)",
+                    color:       "var(--ink-muted)",
+                    border:      "1.5px solid var(--border)",
                   }
             }
           >
-            <span>{f.icon}</span>
-            <span>{f.label}</span>
+            {f.label}
           </button>
         ))}
+
+        {pagination.total !== undefined && (
+          <span
+            className="ml-auto text-xs font-bold"
+            style={{ color: "var(--ink-faint)" }}
+          >
+            {pagination.total} total entries
+          </span>
+        )}
       </div>
 
       {/* ── Content ── */}
@@ -209,12 +195,15 @@ const History = () => {
 
           {/* ── Pagination ── */}
           {pagination.totalPages > 1 && (
-            <div className="flex items-center justify-center gap-2
-                            pt-2 animate-fade-in">
+            <div
+              className="flex items-center justify-center gap-2
+                         pt-2 animate-fade-in"
+            >
               <button
                 onClick={() => setPage((p) => p - 1)}
                 disabled={!pagination.hasPrevPage}
-                className="btn-secondary text-sm px-4 py-2 disabled:opacity-40"
+                className="btn-secondary text-sm px-4 py-2
+                           disabled:opacity-40"
               >
                 ← Prev
               </button>
@@ -248,21 +237,21 @@ const History = () => {
                       <button
                         key={p}
                         onClick={() => setPage(p)}
-                        className="w-9 h-9 rounded-xl text-sm font-bold
+                        className="w-9 h-9 rounded-lg text-sm font-bold
                                    transition-all duration-200
                                    hover:-translate-y-0.5"
                         style={
                           page === p
                             ? {
-                                background:
-                                  "linear-gradient(135deg,#6c63ff,#4c3de4)",
-                                color: "white",
-                                boxShadow: "0 4px 12px rgba(108,99,255,0.3)",
+                                background: "var(--forest)",
+                                color:      "white",
+                                border:     "2px solid var(--forest)",
+                                boxShadow:  "0 4px 12px rgba(74,92,63,0.25)",
                               }
                             : {
                                 background: "var(--surface)",
-                                color: "var(--ink-muted)",
-                                border: "1.5px solid var(--border)",
+                                color:      "var(--ink-muted)",
+                                border:     "1.5px solid var(--border)",
                               }
                         }
                       >
@@ -275,7 +264,8 @@ const History = () => {
               <button
                 onClick={() => setPage((p) => p + 1)}
                 disabled={!pagination.hasNextPage}
-                className="btn-secondary text-sm px-4 py-2 disabled:opacity-40"
+                className="btn-secondary text-sm px-4 py-2
+                           disabled:opacity-40"
               >
                 Next →
               </button>
