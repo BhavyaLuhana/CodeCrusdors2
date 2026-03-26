@@ -1,6 +1,7 @@
 // backend/models/Subject.js
 
 import mongoose from "mongoose";
+import slugify from "slugify";
 
 const subjectSchema = new mongoose.Schema(
   {
@@ -49,13 +50,9 @@ subjectSchema.virtual("signs", {
   foreignField: "subjectId",
 });
 
-// Auto-generate slug from name before saving
 subjectSchema.pre("save", function (next) {
-  if (this.isModified("name")) {
-    this.slug = this.name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "");
+  if (!this.slug) {
+    this.slug = slugify(this.name, { lower: true });
   }
   next();
 });

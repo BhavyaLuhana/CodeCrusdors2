@@ -22,15 +22,25 @@ const protect = asyncHandler(async (req, res, next) => {
 
   const token = authHeader.split(" ")[1];
 
+  // CHANGED FROM HERE TO LINE 43 on 25/3/26
   // Verify token with Clerk SDK
-  const payload = await clerkClient.verifyToken(token);
+  let payload;
+
+  try {
+    // This works for @clerk/backend v1.x
+    payload = await verifyToken(token, {
+      secretKey: process.env.CLERK_SECRET_KEY,
+    });
+  } catch (err) {
+    res.status(401);
+    throw new Error("Invalid or expired token.");
+  }
 
   if (!payload || !payload.sub) {
     res.status(401);
     throw new Error("Invalid or expired token.");
   }
 
-  // Attach Clerk payload to request
   req.auth = payload;
 
   // Look up the MongoDB user by clerkId
@@ -52,7 +62,6 @@ const protect = asyncHandler(async (req, res, next) => {
 
   // Attach MongoDB user to request for downstream use
   req.user = user;
-
   next();
 });
 

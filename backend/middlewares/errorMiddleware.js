@@ -21,20 +21,20 @@ const errorHandler = (err, req, res, next) => {
   let statusCode = res.statusCode !== 200 ? res.statusCode : 500;
   let message = err.message || "Internal Server Error";
 
-  // ── Mongoose: Bad ObjectId ─────────────────────────────────────────────────
+  // Mongoose: Bad ObjectId
   if (err.name === "CastError" && err.kind === "ObjectId") {
     statusCode = 400;
     message = `Invalid ID format: ${err.value}`;
   }
 
-  // ── Mongoose: Duplicate Key ────────────────────────────────────────────────
+  //  Mongoose: Duplicate Key
   if (err.code === 11000) {
     statusCode = 409;
     const field = Object.keys(err.keyValue)[0];
     message = `Duplicate value for field: '${field}'. Please use a unique value.`;
   }
 
-  // ── Mongoose: Validation Error ────────────────────────────────────────────
+  // Mongoose: Validation Error
   if (err.name === "ValidationError") {
     statusCode = 422;
     message = Object.values(err.errors)
@@ -42,7 +42,7 @@ const errorHandler = (err, req, res, next) => {
       .join(", ");
   }
 
-  // ── JWT / Clerk Auth Errors ───────────────────────────────────────────────
+  // JWT / Clerk Auth Errors
   if (err.name === "JsonWebTokenError" || err.name === "TokenExpiredError") {
     statusCode = 401;
     message =
@@ -51,7 +51,7 @@ const errorHandler = (err, req, res, next) => {
         : "Invalid authentication token.";
   }
 
-  // ── Axios / ML Service Errors ─────────────────────────────────────────────
+  // Axios / ML Service Errors
   if (err.isAxiosError) {
     statusCode = 502;
     message = "ML service is unavailable. Please try again later.";
@@ -61,7 +61,7 @@ const errorHandler = (err, req, res, next) => {
     }
   }
 
-  // ── Response ──────────────────────────────────────────────────────────────
+  // Response
   res.status(statusCode).json({
     success: false,
     message,
