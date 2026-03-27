@@ -33,7 +33,6 @@ const subjects = [
 ];
 
 // Signs for Alphabets — using placeholder images
-// Replace imageUrl with your real image URLs later
 const alphabetSigns = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((letter) => ({
   name:            letter,
   meaning:         `The letter ${letter} in Indian Sign Language`,
@@ -118,16 +117,16 @@ const greetingSigns = [
 const seed = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI);
-    console.log("✅ Connected to MongoDB");
+    console.log("Connected to MongoDB");
 
     // Clear existing data
     await Subject.deleteMany({});
     await Sign.deleteMany({});
-    console.log("🗑  Cleared existing subjects and signs");
+    console.log("Cleared existing subjects and signs");
 
     // Create subjects
     const createdSubjects = await Subject.insertMany(subjects);
-    console.log(`✅ Created ${createdSubjects.length} subjects`);
+    console.log(`Created ${createdSubjects.length} subjects`);
 
     // Find each subject by name
     const alphabetSubject  = createdSubjects.find((s) => s.name === "Alphabets");
@@ -148,15 +147,15 @@ const seed = async () => {
     ];
 
     const createdSigns = await Sign.insertMany(allSigns);
-    console.log(`✅ Created ${createdSigns.length} signs`);
+    console.log(`Created ${createdSigns.length} signs`);
 
-    console.log("\n🎉 Database seeded successfully!");
-    console.log(`   Subjects : ${createdSubjects.length}`);
-    console.log(`   Signs    : ${createdSigns.length}`);
+    console.log("\n Database seeded successfully!");
+    console.log(`Subjects : ${createdSubjects.length}`);
+    console.log(`Signs : ${createdSigns.length}`);
 
     process.exit(0);
   } catch (err) {
-    console.error("❌ Seed failed:", err.message);
+    console.error("Seed failed:", err.message);
     process.exit(1);
   }
 };
