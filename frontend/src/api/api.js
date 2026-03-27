@@ -4,7 +4,7 @@ import axios from "axios";
 
 // ── Axios Instance ─────────────────────────────────────────────────────────────
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "https://code-crusdors2-52trkn88b-bhavya-luhanas-projects.vercel.app/api/v1",
+  baseURL: import.meta.env.VITE_API_BASE_URL || "https://code-crusdors2.vercel.app/api/v1",
   timeout: 30000,
   headers: {
     "Content-Type": "application/json",
