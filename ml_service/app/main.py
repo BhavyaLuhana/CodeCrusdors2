@@ -43,7 +43,7 @@ app = FastAPI(
 # CORS
 allowed_origins = os.getenv(
     "ALLOWED_ORIGINS",
-    "https://sign-ml.onrender.com,https://code-crusdors2.vercel.app"
+    "https://sign-h37w.onrender.com"
 ).split(",")
 
 app.add_middleware(
