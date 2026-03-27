@@ -32,7 +32,7 @@ app.use(helmet());
 // CORS — allow only frontend origin
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "https://code-crusdors2-52trkn88b-bhavya-luhanas-projects.vercel.app",
+    origin: process.env.CLIENT_URL || "https://code-crusdors2.vercel.app",
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
