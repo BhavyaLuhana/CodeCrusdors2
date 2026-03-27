@@ -2,7 +2,7 @@
 
 import asyncHandler from "../utils/asyncHandler.js";
 import History from "../models/History.js";
-import mlService from "../services/mlService.js";
+import mlService from "../services/MLService.js";
 
 const DEFAULT_PAGE_SIZE = 10;
 const MAX_PAGE_SIZE = 50;
