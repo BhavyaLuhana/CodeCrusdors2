@@ -21,9 +21,9 @@ logger = logging.getLogger(__name__)
 # Lifespan
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("🚀 Sign Language ML Service starting...")
+    logger.info("Sign Language ML Service starting...")
     yield
-    logger.info("🛑 Sign Language ML Service shutting down...")
+    logger.info("Sign Language ML Service shutting down...")
 
 
 # App

@@ -1,5 +1,3 @@
-// backend/utils/uploadImages.js
-
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
 import path from "path";
@@ -15,7 +13,6 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Path to your Indian/ dataset folder
 const DATASET_PATH = "C:/Users/Bhavya/Downloads/Indian";
 
 const uploadAndSeed = async () => {
@@ -35,7 +32,7 @@ const uploadAndSeed = async () => {
 
     if (images.length === 0) continue;
 
-    // Upload just the first image per folder as representative
+    // Upload first image only per folder as representative
     const firstImage = path.join(folderPath, images[0]);
 
     try {
@@ -46,7 +43,7 @@ const uploadAndSeed = async () => {
         overwrite: true,
       });
 
-      // Update the sign in DB with the Cloudinary URL
+      // Update the sign collextion with the Cloudinary URL
       await Sign.findOneAndUpdate(
         { name: folder },
         { imageUrl: result.secure_url }
