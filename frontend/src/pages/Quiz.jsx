@@ -1,14 +1,16 @@
 // frontend/src/pages/Quiz.jsx
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import {
   Brain, Trophy, ChevronRight, X, RotateCcw,
+  CheckCircle, XCircle,
 } from "lucide-react";
 import Flashcard from "../components/quiz/Flashcard";
 import Loader from "../components/ui/Loader";
 import ErrorMessage from "../components/ui/ErrorMessage";
 import useApi from "../hooks/useApi";
 import { quizAPI, subjectAPI } from "../api/api";
+
 
 const QUIZ_SIZES = [5, 10, 15, 20];
 
@@ -259,21 +261,24 @@ const QuizResults = ({ results, total, onRestart }) => {
   const [saved,  setSaved]  = useState(false);
   const [saving, setSaving] = useState(false);
 
-  const save = useCallback(async () => {
-    if (saved || saving) return;
-    try {
-      setSaving(true);
-      await quizAPI.submitBatch({
-        attempts:  results,
-        sessionId: results[0]?.sessionId,
-      });
-      setSaved(true);
-    } finally {
-      setSaving(false);
-    }
-  }, [results, saved, saving]);
-
-  useState(() => { save(); });
+  useEffect(() => {
+    const save = async () => {
+      if (results.length === 0) return;
+      try {
+        setSaving(true);
+        await quizAPI.submitBatch({
+          attempts:  results,
+          sessionId: results[0]?.sessionId,
+        });
+        setSaved(true);
+      } catch (err) {
+        console.error("Failed to save results:", err.message);
+      } finally {
+        setSaving(false);
+      }
+    };
+    save();
+  }, []);
 
   const trophyColor =
     accuracy >= 80 ? "var(--forest)"

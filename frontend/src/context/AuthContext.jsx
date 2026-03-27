@@ -1,6 +1,6 @@
 // frontend/src/context/AuthContext.jsx
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useRef } from "react";
 import { useUser, useAuth } from "@clerk/clerk-react";
 import { authAPI, setAuthToken } from "../api/api";
 
@@ -10,34 +10,57 @@ export const AuthProvider = ({ children }) => {
   const { user, isLoaded: isUserLoaded } = useUser();
   const { getToken, isSignedIn }         = useAuth();
 
-  const [dbUser, setDbUser]   = useState(null);
-  const [syncing, setSyncing] = useState(false);
-  const [error, setError]     = useState(null);
+  const [dbUser,   setDbUser]   = useState(null);
+  const [syncing,  setSyncing]  = useState(false);
+  const [error,    setError]    = useState(null);
+  const [ready,    setReady]    = useState(false);
+  const syncedRef               = useRef(false);
 
-  // Sync Clerk user to MongoDB on sign-in
   useEffect(() => {
     const syncUser = async () => {
       if (!isUserLoaded || !isSignedIn || !user) return;
+      if (syncedRef.current) return; // Prevent double sync
 
       try {
         setSyncing(true);
         setError(null);
 
-        // Get fresh Clerk JWT
+        // Step 1 — get token
         const token = await getToken();
+
+        if (!token) {
+          throw new Error("Failed to get authentication token.");
+        }
+
+        // Step 2 — set token on axios BEFORE any API call
         setAuthToken(token);
 
-        // Sync to MongoDB
+        // Step 3 — sync user to MongoDB
+        const email =
+          user.primaryEmailAddress?.emailAddress ||
+          user.emailAddresses?.[0]?.emailAddress;
+
+        const name =
+          user.fullName ||
+          `${user.firstName || ""} ${user.lastName || ""}`.trim() ||
+          email ||
+          "User";
+
         const response = await authAPI.sync({
           clerkId: user.id,
-          name:    user.fullName || user.firstName || "User",
-          email:   user.primaryEmailAddress?.emailAddress,
+          name,
+          email,
         });
 
         setDbUser(response.data);
+        syncedRef.current = true;
+        setReady(true);
+
       } catch (err) {
         console.error("User sync failed:", err.message);
         setError(err.message);
+        // Still set ready so UI doesn't hang
+        setReady(true);
       } finally {
         setSyncing(false);
       }
@@ -46,21 +69,27 @@ export const AuthProvider = ({ children }) => {
     syncUser();
   }, [isUserLoaded, isSignedIn, user]);
 
-  // Clear token and dbUser on sign-out
+  // Clear on sign out
   useEffect(() => {
     if (isUserLoaded && !isSignedIn) {
       setAuthToken(null);
       setDbUser(null);
+      setReady(false);
+      syncedRef.current = false;
     }
   }, [isUserLoaded, isSignedIn]);
 
-  // Refresh token before it expires (every 50 seconds)
+  // Refresh token every 50 seconds
   useEffect(() => {
     if (!isSignedIn) return;
 
     const interval = setInterval(async () => {
-      const token = await getToken();
-      setAuthToken(token);
+      try {
+        const token = await getToken();
+        if (token) setAuthToken(token);
+      } catch (err) {
+        console.error("Token refresh failed:", err.message);
+      }
     }, 50 * 1000);
 
     return () => clearInterval(interval);
@@ -68,12 +97,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{
-        dbUser,
-        syncing,
-        error,
-        isReady: isUserLoaded && !syncing,
-      }}
+      value={{ dbUser, syncing, error, isReady: ready }}
     >
       {children}
     </AuthContext.Provider>
