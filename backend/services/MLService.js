@@ -2,7 +2,7 @@
 
 import axios from "axios";
 
-const ML_SERVICE_URL = process.env.ML_SERVICE_URL || "https://sign-ml.onrender.com";
+const ML_SERVICE_URL = process.env.ML_SERVICE_URL || "http://localhost:8000";
 
 // Axios instance dedicated to ML service
 const mlClient = axios.create({
