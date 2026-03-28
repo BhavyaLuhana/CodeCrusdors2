@@ -27,6 +27,9 @@
     "seed": "node utils/seed.js",
     "upload-images": "node utils/uploadImages.js"
   },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/BhavyaLuhana/CodeCrusdors2.git"

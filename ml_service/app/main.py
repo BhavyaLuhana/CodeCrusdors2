@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers.predict import router
+from app.services.model_loader import ensure_model_exists
 
 load_dotenv()
 
@@ -17,23 +18,17 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-
 # Lifespan
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("🚀 Sign Language ML Service starting...")
+    logger.info("🚀 ML Service starting up...")
+    # Download model if not present
+    ensure_model_exists()
     yield
-    logger.info("🛑 Sign Language ML Service shutting down...")
+    logger.info("🛑 ML Service shutting down...")
 
-
-# App
 app = FastAPI(
     title="Sign Language ML Service",
-    description=(
-        "FastAPI microservice wrapping a trained CNN model "
-        "for Indian Sign Language recognition. "
-        "Supports file upload and base64 input."
-    ),
     version="1.0.0",
     lifespan=lifespan,
     docs_url="/docs",
@@ -43,12 +38,12 @@ app = FastAPI(
 # CORS
 allowed_origins = os.getenv(
     "ALLOWED_ORIGINS",
-    "http://localhost:5000,http://localhost:5173"
+    "http://localhost:5000"
 ).split(",")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
+    allow_origins=["*"],  # Update after deployment
     allow_credentials=True,
     allow_methods=["GET", "POST"],
     allow_headers=["Content-Type", "Authorization"],
