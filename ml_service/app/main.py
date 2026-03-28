@@ -21,17 +21,11 @@ logger = logging.getLogger(__name__)
 # Lifespan
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-<<<<<<< HEAD
     logger.info("🚀 ML Service starting up...")
     # Download model if not present
     ensure_model_exists()
     yield
     logger.info("🛑 ML Service shutting down...")
-=======
-    logger.info("Sign Language ML Service starting...")
-    yield
-    logger.info("Sign Language ML Service shutting down...")
->>>>>>> e5e78c73acb617f575896bf2af5fa8203128bb82
 
 app = FastAPI(
     title="Sign Language ML Service",
