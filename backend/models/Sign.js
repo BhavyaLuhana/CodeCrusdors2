@@ -23,7 +23,7 @@ const signSchema = new mongoose.Schema(
     },
     videoUrl: {
       type: String,
-      trim: true, // Optional: video demonstration of the sign
+      trim: true, 
     },
     meaning: {
       type: String,

@@ -5,9 +5,6 @@ import User from "../models/User.js";
 
 /**
  * POST /api/v1/auth/sync
- * Called from frontend after Clerk sign-in.
- * Creates user in MongoDB if first time, otherwise returns existing user.
- * Public route — JWT is verified client-side by Clerk before calling this.
  */
 const syncUser = asyncHandler(async (req, res) => {
   const { clerkId, name, email } = req.body;
@@ -17,44 +14,60 @@ const syncUser = asyncHandler(async (req, res) => {
     throw new Error("clerkId, name, and email are required.");
   }
 
-  // Upsert: find existing user or create new one
-  const user = await User.findOneAndUpdate(
-    { clerkId },
-    { clerkId, name, email },
-    {
-      upsert: true,       // Create if not found
-      new: true,          // Return updated document
-      runValidators: true,
-      setDefaultsOnInsert: true,
-    }
-  ).select("-__v");
+  // Find by clerkId first
+  let user = await User.findOne({ clerkId });
 
-  const isNew = !user.createdAt || 
-    (Date.now() - new Date(user.createdAt).getTime()) < 3000;
+  if (user) {
+    // User exists — update name/email in case they changed
+    user.name  = name;
+    user.email = email;
+    await user.save();
 
-  res.status(isNew ? 201 : 200).json({
+    return res.status(200).json({
+      success: true,
+      message: "User synced successfully.",
+      data:    user,
+    });
+  }
+
+  // Check if email already exists under different clerkId
+  const emailExists = await User.findOne({ email });
+
+  if (emailExists) {
+    // Update that record with the new clerkId
+    emailExists.clerkId = clerkId;
+    emailExists.name    = name;
+    await emailExists.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "User synced successfully.",
+      data:    emailExists,
+    });
+  }
+
+  // Create new user
+  user = await User.create({ clerkId, name, email });
+
+  res.status(201).json({
     success: true,
-    message: isNew ? "User created successfully." : "User synced successfully.",
-    data: user,
+    message: "User created successfully.",
+    data:    user,
   });
 });
 
 /**
  * GET /api/v1/auth/me
- * Protected route — returns the currently authenticated user's profile.
- * req.user is attached by authMiddleware protect()
  */
 const getMe = asyncHandler(async (req, res) => {
   res.status(200).json({
     success: true,
-    data: req.user,
+    data:    req.user,
   });
 });
 
 /**
  * PUT /api/v1/auth/me
- * Protected route — allows user to update their name.
- * Email and clerkId are immutable from this endpoint.
  */
 const updateMe = asyncHandler(async (req, res) => {
   const { name } = req.body;
@@ -73,7 +86,7 @@ const updateMe = asyncHandler(async (req, res) => {
   res.status(200).json({
     success: true,
     message: "Profile updated successfully.",
-    data: updated,
+    data:    updated,
   });
 });
 

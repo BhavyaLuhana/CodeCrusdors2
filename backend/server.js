@@ -30,11 +30,20 @@ const app = express();
 app.use(helmet());
 
 // CORS — allow only frontend origin
+
+const allowedOrigins = [
+  "https://code-crusdors2-r4wrrvhl2-bhavya-luhanas-projects.vercel.app",
+  "https://code-crusdors2.vercel.app"
+];
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );

@@ -1,17 +1,39 @@
 // backend/middleware/authMiddleware.js
 
-import { createClerkClient } from "@clerk/backend";
 import asyncHandler from "../utils/asyncHandler.js";
 import User from "../models/User.js";
-
-const clerkClient = createClerkClient({
-  secretKey: process.env.CLERK_SECRET_KEY,
-});
+import * as ClerkBackend from "@clerk/backend";
 
 /**
- * Protect routes — verifies Clerk session token from Authorization header.
- * Attaches `req.auth` (Clerk payload) and `req.user` (MongoDB user doc).
+ * Verify Clerk JWT — works with all @clerk/backend versions
  */
+const verifyClerkToken = async (token) => {
+  const secretKey = process.env.CLERK_SECRET_KEY;
+
+  // Try method 1 — named export verifyToken (v1.x)
+  if (typeof ClerkBackend.verifyToken === "function") {
+    return await ClerkBackend.verifyToken(token, { secretKey });
+  }
+
+  // Try method 2 — createClerkClient (v1.x/v2.x)
+  if (typeof ClerkBackend.createClerkClient === "function") {
+    const client = ClerkBackend.createClerkClient({ secretKey });
+    if (typeof client.verifyToken === "function") {
+      return await client.verifyToken(token);
+    }
+  }
+
+  // Try method 3 — default export
+  if (typeof ClerkBackend.default?.verifyToken === "function") {
+    return await ClerkBackend.default.verifyToken(token, { secretKey });
+  }
+
+  throw new Error(
+    "Could not find verifyToken in @clerk/backend. " +
+    "Run: npm list @clerk/backend to check your version."
+  );
+};
+
 const protect = asyncHandler(async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
@@ -22,57 +44,47 @@ const protect = asyncHandler(async (req, res, next) => {
 
   const token = authHeader.split(" ")[1];
 
-  // CHANGED FROM HERE TO LINE 43 on 25/3/26
-  // Verify token with Clerk SDK
-  let payload;
-
-  try {
-    // This works for @clerk/backend v1.x
-    payload = await verifyToken(token, {
-      secretKey: process.env.CLERK_SECRET_KEY,
-    });
-  } catch (err) {
+  if (!token) {
     res.status(401);
-    throw new Error("Invalid or expired token.");
+    throw new Error("Token is empty.");
   }
 
-  if (!payload || !payload.sub) {
+  let payload;
+  try {
+    payload = await verifyClerkToken(token);
+  } catch (err) {
+    console.error("Token verification failed:", err.message);
     res.status(401);
-    throw new Error("Invalid or expired token.");
+    throw new Error("Invalid or expired token. Please sign in again.");
+  }
+
+  if (!payload?.sub) {
+    res.status(401);
+    throw new Error("Invalid token payload.");
   }
 
   req.auth = payload;
 
-  // Look up the MongoDB user by clerkId
-  const user = await User.findOne({ clerkId: payload.sub }).select(
-    "-__v"
-  );
+  const user = await User.findOne({ clerkId: payload.sub }).select("-__v");
 
   if (!user) {
     res.status(401);
     throw new Error(
-      "User not found. Please complete sign-in to sync your account."
+      "User not found. Please sign out and sign in again."
     );
   }
 
   if (!user.isActive) {
     res.status(403);
-    throw new Error("Your account has been deactivated. Contact support.");
+    throw new Error("Your account has been deactivated.");
   }
 
-  // Attach MongoDB user to request for downstream use
   req.user = user;
   next();
 });
 
-/**
- * Restrict access to admin role only.
- * Must be used AFTER `protect` middleware.
- */
 const adminOnly = (req, res, next) => {
-  if (req.user && req.user.role === "admin") {
-    return next();
-  }
+  if (req.user?.role === "admin") return next();
   res.status(403);
   throw new Error("Access denied. Admins only.");
 };
