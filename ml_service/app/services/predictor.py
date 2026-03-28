@@ -55,17 +55,17 @@ class SignLanguagePredictor:
         self._load_model()
 
     def _load_model(self):
-        """
-        Auto-detects .h5 or .keras and loads the model.
-        Tries MODEL_PATH first, then fallbacks.
-        """
         try:
             import tensorflow as tf
+            from app.services.model_loader import ensure_model_exists
 
-            # Build candidate paths to try
+            # Download model if not present
+            if not ensure_model_exists():
+                logger.error("❌ Model could not be loaded or downloaded.")
+                self.is_loaded = False
+                return
+
             candidates = [MODEL_PATH]
-
-            # If .h5 not found, try .keras and vice versa
             if MODEL_PATH.endswith(".h5"):
                 candidates.append(MODEL_PATH.replace(".h5", ".keras"))
             elif MODEL_PATH.endswith(".keras"):
@@ -80,22 +80,18 @@ class SignLanguagePredictor:
                     self.loaded_model_path = path
                     loaded = True
                     logger.info(
-                        f"✅ Model loaded successfully.\n"
-                        f"   Path:        {path}\n"
-                        f"   Input shape: {self.model.input_shape}\n"
-                        f"   Classes:     {len(CLASS_LABELS)}"
+                        f"✅ Model loaded.\n"
+                        f"   Path: {path}\n"
+                        f"   Input: {self.model.input_shape}\n"
+                        f"   Classes: {len(CLASS_LABELS)}"
                     )
                     break
 
             if not loaded:
                 raise FileNotFoundError(
-                    f"No model file found. Tried: {candidates}\n"
-                    f"Place your model file inside ml_service/ folder."
+                    f"No model file found. Tried: {candidates}"
                 )
 
-        except FileNotFoundError as e:
-            logger.error(f"❌ {e}")
-            self.is_loaded = False
         except Exception as e:
             logger.error(f"❌ Failed to load model: {e}")
             self.is_loaded = False
